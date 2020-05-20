@@ -1,3 +1,4 @@
+# this is a crc test
 def calc_crc(string):
     data = bytearray.fromhex(string)
     crc = 0xFFFF
