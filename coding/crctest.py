@@ -1,5 +1,6 @@
 # this is a crc test
 # this is from network
+# undefine
 def calc_crc(string):
     data = bytearray.fromhex(string)
     crc = 0xFFFF
