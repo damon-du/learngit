@@ -1,16 +1,26 @@
 # 杭州6米站将AE转换为XY，输出dat文件，实现天线的驱动
 
 import math
+import numpy as np
 
 PI = math.pi
+# 最终结果列表
 xy_list = []
+# xy轴值列表
+xz_list = []
+yz_list = []
+# 插值后的列表
+xz_value8_list = []
+yz_value8_list = []
 
-with open('hz1.txt', 'r') as fi:
+with open('hz2.txt', 'r') as fi:
     lines = fi.readlines()
 
 for line in lines:
     line_list = line.split(' ')
     line_list = [i for i in line_list if i != '']
+    # print(line_list)
+
     Az = float(line_list[-3])
     El = float(line_list[-2])
     # Az和El转换为XY轴的值
@@ -19,35 +29,83 @@ for line in lines:
         math.tan(math.pi * El / 180)) * 180 / math.pi + 90
     Yz = math.asin(
         math.cos(PI * Az / 180) * math.cos(PI * El / 180)) * 180 / PI + 90
-    # Xz = '%.3f' % Xz
-    Xz = '{:.2f}'.format(Xz)
+    # 加入列表
+    xz_list.append(Xz)
+    yz_list.append(Yz)
+    # 转换为固定长度的字符串
+    Xz = '{:.3f}'.format(Xz)
+    Xz = Xz.rjust(7, ' ')
     Yz = '%.3f' % Yz
-    # Xz = round(Xz, 3)
-    # Yz = round(Yz, 3)
+    Yz = Yz.rjust(7, ' ')
     # 拼接格式
+    # 年
     yyyy = line_list[0] + ' '
-    mm = line_list[1] + ' '
-    dd = line_list[2] + ' '
-    hh = line_list[3] + ' '
-    mm = line_list[4] + ' '
+    # 月
+    month = line_list[1]
+    if '0' in month:
+        month = month.replace('0', ' ')
+    month = month + ' '
+    # 日
+    dd = line_list[2]
+    if dd[0] == '0':
+        dd = dd.replace('0', ' ')
+    dd = dd + ' '
+    # 时
+    hh = line_list[3]
+    if hh[0] == '0':
+        hh = hh.replace('0', ' ')
+    hh = hh + ' '
+    # 分
+    mm = line_list[4]
+    if mm[0] == '0':
+        mm = mm.replace('0', ' ')
+    mm = mm + ' '
+    # 秒
     ss = line_list[5].split('.')[0]
-    if len(ss) < 2:
-        ss = ' ' + line_list[5].split('.')[0] + '   '
-    else:
-        ss = line_list[5].split('.')[0] + '   '
-    # xxx = str(Xz) + '  '
+    ss = ss.rjust(2, ' ') + '   '
+    # XY轴
     xxx = Xz + '  '
-
-    # yyy = str(Yz) + '  '
     yyy = Yz + '  '
-
-    aaa = line_list[-3] + '  '
-    eee = line_list[-2]
-    lineXY = yyyy + mm + dd + hh + mm + ss + xxx + yyy + aaa + eee + '\n'
+    # AE角度
+    aaa = line_list[-3].rjust(8, ' ') + '  '
+    eee = line_list[-2].rjust(7, ' ')
+    # 构成字符串
+    lineXY = yyyy + month + dd + hh + mm + ss + xxx + yyy + aaa + eee + '\n'
     xy_list.append(lineXY)
-    with open('XY.dat', 'w') as fo:
-        fo.writelines(xy_list)
-    print(lineXY)
-    print(Xz)
-    print(Yz)
-    print(line_list)
+
+# 将列表复制8份
+xy_list = [v for v in xy_list for i in range(8)]
+
+# 插值
+print(len(xz_list))
+for i in range(len(xz_list)):
+    if i < len(xz_list) - 1:
+        step = xz_list[i + 1] - xz_list[i]
+        stepy = yz_list[i+1] - yz_list[i]
+        # 计算插值，生成列表
+        xz_interp_list = np.arange(xz_list[i], xz_list[i + 1], step / 8)
+        # 转换为字符串列表
+        xz_interp_list = ['{:.3f}'.format(v).rjust(7,' ') for v in xz_interp_list]
+        yz_interp_list = np.arange(yz_list[i], yz_list[i + 1], stepy / 8)
+        yz_interp_list = ['{:.3f}'.format(v).rjust(7,' ') for v in yz_interp_list]
+        # 填入列表
+        xz_value8_list.extend(xz_interp_list)
+        yz_value8_list.extend(yz_interp_list)
+    # if i == len(xz_list) - 1:
+    #     l = []
+    #     l.append(xz_list[i])        
+    #     xz_value8_list.extend(l * 8)
+    #     l = []
+    #     l.append(yz_list[i])
+    #     yz_value8_list.extend(l*8)
+
+print(len(xy_list))
+print(len(xz_value8_list),len(yz_value8_list))
+
+# 用插值后的列表元素替换引导文件中的字段
+
+# for i in range(len(xz_value8_list)):
+    # xy_list[6] = 
+# 写入文件
+with open('XY.dat', 'w') as fo:
+    fo.writelines(xy_list)
