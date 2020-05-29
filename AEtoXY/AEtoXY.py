@@ -5,6 +5,8 @@ import numpy as np
 
 PI = math.pi
 # 最终结果列表
+xy_value_list = []
+# 中间计算过程列表
 xy_list = []
 # xy轴值列表
 xz_list = []
@@ -81,31 +83,39 @@ print(len(xz_list))
 for i in range(len(xz_list)):
     if i < len(xz_list) - 1:
         step = xz_list[i + 1] - xz_list[i]
-        stepy = yz_list[i+1] - yz_list[i]
+        stepy = yz_list[i + 1] - yz_list[i]
         # 计算插值，生成列表
         xz_interp_list = np.arange(xz_list[i], xz_list[i + 1], step / 8)
         # 转换为字符串列表
-        xz_interp_list = ['{:.3f}'.format(v).rjust(7,' ') for v in xz_interp_list]
+        xz_interp_list = [
+            '{:.3f}'.format(v).rjust(7, ' ') for v in xz_interp_list
+        ]
         yz_interp_list = np.arange(yz_list[i], yz_list[i + 1], stepy / 8)
-        yz_interp_list = ['{:.3f}'.format(v).rjust(7,' ') for v in yz_interp_list]
+        yz_interp_list = [
+            '{:.3f}'.format(v).rjust(7, ' ') for v in yz_interp_list
+        ]
         # 填入列表
         xz_value8_list.extend(xz_interp_list)
         yz_value8_list.extend(yz_interp_list)
     # if i == len(xz_list) - 1:
     #     l = []
-    #     l.append(xz_list[i])        
+    #     l.append(xz_list[i])
     #     xz_value8_list.extend(l * 8)
     #     l = []
     #     l.append(yz_list[i])
     #     yz_value8_list.extend(l*8)
 
 print(len(xy_list))
-print(len(xz_value8_list),len(yz_value8_list))
-
+print(len(xz_value8_list), len(yz_value8_list))
+# print(xz_value8_list)
 # 用插值后的列表元素替换引导文件中的字段
-
+for i in range(len(xz_value8_list)):
+    line = xy_list[i]
+    print(line)
+    line = line[:22] + xz_value8_list[i]+'  '+yz_value8_list[i]+'  '+line[40:]
+    xy_value_list.append(line)
 # for i in range(len(xz_value8_list)):
-    # xy_list[6] = 
+# xy_list[6] =
 # 写入文件
 with open('XY.dat', 'w') as fo:
-    fo.writelines(xy_list)
+    fo.writelines(xy_value_list)
