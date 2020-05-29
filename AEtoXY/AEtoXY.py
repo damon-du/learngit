@@ -11,11 +11,15 @@ xy_list = []
 # xy轴值列表
 xz_list = []
 yz_list = []
+az_list = []
+el_list = []
 # 插值后的列表
 xz_value8_list = []
 yz_value8_list = []
+az_value8_list = []
+el_value8_list = []
 
-with open('hz2.txt', 'r') as fi:
+with open('HZ052923.RAE', 'r') as fi:
     lines = fi.readlines()
 
 for line in lines:
@@ -24,7 +28,9 @@ for line in lines:
     # print(line_list)
 
     Az = float(line_list[-3])
+    az_list.append(Az)
     El = float(line_list[-2])
+    el_list.append(El)
     # Az和El转换为XY轴的值
     Xz = math.atan(
         math.sin(math.pi * Az / 180) /
@@ -65,14 +71,14 @@ for line in lines:
     # 秒
     ss = line_list[5].split('.')[0]
     ss = ss.rjust(2, ' ') + '   '
-    # XY轴
-    xxx = Xz + '  '
-    yyy = Yz + '  '
-    # AE角度
-    aaa = line_list[-3].rjust(8, ' ') + '  '
-    eee = line_list[-2].rjust(7, ' ')
+    # # XY轴
+    # xxx = Xz + '  '
+    # yyy = Yz + '  '
+    # # AE角度
+    # aaa = line_list[-3].rjust(8, ' ') + '  '
+    # eee = line_list[-2].rjust(7, ' ')
     # 构成字符串
-    lineXY = yyyy + month + dd + hh + mm + ss + xxx + yyy + aaa + eee + '\n'
+    lineXY = yyyy + month + dd + hh + mm + ss + '\n'
     xy_list.append(lineXY)
 
 # 将列表复制8份
@@ -84,6 +90,8 @@ for i in range(len(xz_list)):
     if i < len(xz_list) - 1:
         step = xz_list[i + 1] - xz_list[i]
         stepy = yz_list[i + 1] - yz_list[i]
+        stepa = az_list[i + 1] - az_list[i]
+        stepe = el_list[i + 1] - el_list[i]
         # 计算插值，生成列表
         xz_interp_list = np.arange(xz_list[i], xz_list[i + 1], step / 8)
         # 转换为字符串列表
@@ -94,9 +102,19 @@ for i in range(len(xz_list)):
         yz_interp_list = [
             '{:.3f}'.format(v).rjust(7, ' ') for v in yz_interp_list
         ]
+        az_interp_list = np.arange(az_list[i], az_list[i + 1], stepa / 8)
+        az_interp_list = [
+            '{:.4f}'.format(v).rjust(8, ' ') for v in az_interp_list
+        ]
+        el_interp_list = np.arange(el_list[i], el_list[i + 1], stepe / 8)
+        el_interp_list = [
+            '{:.4f}'.format(v).rjust(7, ' ') for v in el_interp_list
+        ]
         # 填入列表
         xz_value8_list.extend(xz_interp_list)
         yz_value8_list.extend(yz_interp_list)
+        az_value8_list.extend(az_interp_list)
+        el_value8_list.extend(el_interp_list)
     # if i == len(xz_list) - 1:
     #     l = []
     #     l.append(xz_list[i])
@@ -104,15 +122,17 @@ for i in range(len(xz_list)):
     #     l = []
     #     l.append(yz_list[i])
     #     yz_value8_list.extend(l*8)
-
-print(len(xy_list))
-print(len(xz_value8_list), len(yz_value8_list))
+print(len(az_value8_list))
+print(len(yz_value8_list))
+print(len(az_value8_list))
+print(len(el_value8_list))
 # print(xz_value8_list)
 # 用插值后的列表元素替换引导文件中的字段
 for i in range(len(xz_value8_list)):
     line = xy_list[i]
-    print(line)
-    line = line[:22] + xz_value8_list[i]+'  '+yz_value8_list[i]+'  '+line[40:]
+    # print(i)
+    line = line[:22] + xz_value8_list[i] + '  ' + yz_value8_list[
+        i] + '  ' + az_value8_list[i] + '  ' + el_value8_list[i]+'\n'
     xy_value_list.append(line)
 # for i in range(len(xz_value8_list)):
 # xy_list[6] =
