@@ -42,7 +42,7 @@ pm = p.T.flatten()
 # 构造bool数组
 p_m = pm > 0
 print('p_m is', p_m)
-ms_bytes = b'\xaa'
+ms_bytes = b'\x55'
 ms_bits = numpy.unpackbits(bytearray(ms_bytes))
 # ms_bits = numpy.arange(10)
 
@@ -57,5 +57,11 @@ if p.any():
 else:
     print('nothing')
 
+puncture = None
+
+if puncture:
+    print('nothing')
+else:
+    print('something')
 
 # print(p.transpose())
