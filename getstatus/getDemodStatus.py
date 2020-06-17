@@ -468,7 +468,7 @@ if __name__ == "__main__":
             else:
                 str_dict = str_dict + key + '@' + dict_status[key] + '#'
         str_status = str_dict[0:-1] + '$'
-        # print(str_status)
+        print(str_status)
         byte_status = bytes(str_status, encoding='utf-8')
         data_length = len(byte_status)
         byte_length = data_length.to_bytes(length=4,
