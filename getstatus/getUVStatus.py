@@ -2,7 +2,6 @@
 通过组播方式获取UV站的状态数据
 '''
 import struct
-import time
 import socket
 
 # 组播组IP和端口
@@ -35,7 +34,6 @@ def receiver():
             )
         except Exception as e:
             print(e)
-            # print("while receive message error occur")
 
 
 if __name__ == "__main__":
